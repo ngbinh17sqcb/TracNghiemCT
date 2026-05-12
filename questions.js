@@ -7,7 +7,8 @@ const quizData = [
             "Có nguồn gốc xuất thân từ giai cấp công nhân hoặc nông dân nghèo",
             "Đạt được thành tích xuất sắc trong lao động sản xuất và chiến đấu"
         ],
-        answer: 1 // Đáp án B
+        answer: 1, // Đáp án B
+        category: "Chủ nghĩa Mác - Lênin"
     },
     {
         question: "2) Theo quan điểm của Lênin, quy luật phổ biến về sự ra đời của Đảng Cộng sản là sự kết hợp giữa những yếu tố.",
@@ -17,7 +18,8 @@ const quizData = [
             "Lý luận tiên phong và sự giác ngộ của giai cấp vô sản",
             "Chủ nghĩa Mác và phong trào công nhân"
         ],
-        answer: 3 // Đáp án D
+        answer: 3, // Đáp án D
+        category: "Chủ nghĩa Mác - Lênin"
     },
     {
         question: "3) Theo Lênin, chủ nghĩa Mác giữ vai trò gì đối với Đảng Cộng sản.",
@@ -27,7 +29,8 @@ const quizData = [
             "Là nền tảng tư tưởng, kim chỉ nam cho mọi hoạt động của Đảng",
             "Là định hướng chiến lược cho phong trào công nhân quốc tế"
         ],
-        answer: 2 // Đáp án C
+        answer: 2, // Đáp án C
+        category: "Chủ nghĩa Mác - Lênin"
     },
     {
         question: "4) Theo quan điểm của Lênin, tiêu chí quan trọng để xem xét một đảng có phải là chính đảng Mácxít hay không.",
@@ -37,7 +40,8 @@ const quizData = [
             "Lấy giai cấp công nhân làm lực lượng nòng cốt",
             "Lấy mục tiêu xây dựng chủ nghĩa xã hội làm định hướng"
         ],
-        answer: 0 // Đáp án A
+        answer: 0, // Đáp án A
+        category: "Chủ nghĩa Mác - Lênin"
     },
     {
         question: "5) Một trong những nguy hiểm lớn nhất đối với Đảng cầm quyền mà V.I.Lênin cảnh báo.",
@@ -47,7 +51,8 @@ const quizData = [
             "Suy thoái về tư tưởng chính trị, đạo đức, lối sống",
             "Xa rời mục tiêu độc lập dân tộc và chủ nghĩa xã hội"
         ],
-        answer: 1 // Đáp án B
+        answer: 1, // Đáp án B
+        category: "Chủ nghĩa Mác - Lênin"
     },
     {
         question: "6) V.I.Lênin coi đoàn kết thống nhất trong Đảng.",
@@ -57,7 +62,8 @@ const quizData = [
             "Quy luật tồn tại và phát triển; nguồn sức mạnh vô tận của Đảng",
             "Động lực chủ yếu để vượt qua mọi khó khăn thử thách"
         ],
-        answer: 2 // Đáp án C
+        answer: 2, // Đáp án C
+        category: "Điều lệ Đảng"
     },
     {
         question: "7) V.I.Lênin yêu cầu phải kiên quyết “đuổi cổ ra khỏi Đảng những đối tượng.",
@@ -67,7 +73,8 @@ const quizData = [
             "Những đảng viên giảm sút ý chí chiến đấu, lười học tập",
             "Những người có tư tưởng trung bình chủ nghĩa, ngại gian khổ"
         ],
-        answer: 0 // Đáp án A
+        answer: 0, // Đáp án A
+        category: "Điều lệ Đảng"
     },
     {
         question: "8) V.I.Lênin khẳng định: “Không có lý luận cách mạng thì cũng không thể có phong trào cách mạng”. Câu nói nhấn mạnh.",
@@ -77,7 +84,8 @@ const quizData = [
             "Tính tất yếu của phong trào đấu tranh giai cấp",
             "Tầm quan trọng của việc học tập lý luận chính trị thường xuyên"
         ],
-        answer: 1 // Đáp án B
+        answer: 1, // Đáp án B
+        category: "Chủ nghĩa Mác - Lênin"
     },
     {
         question: "9) Theo quan điểm của Mác - Ăngghen, điều kiện tiên quyết để giai cấp công nhân có thể thực hiện được sứ mệnh lịch sử của mình.",
@@ -87,7 +95,8 @@ const quizData = [
             "Thành lập chính đảng độc lập của giai cấp công nhân",
             "Giác ngộ sứ mệnh lịch sử và không ngừng đoàn kết quốc tế"
         ],
-        answer: 2 // Đáp án C
+        answer: 2, // Đáp án C
+        category: "Chủ nghĩa Mác - Lênin"
     },
     {
         question: "10) Khẩu hiệu “Vô sản tất cả các nước đoàn kết lại trong Tuyên ngôn của Đảng Cộng sản thể hiện nội dung nào.",
@@ -97,6 +106,7 @@ const quizData = [
             "Khát vọng hòa bình và tự do của nhân dân lao động",
             "Tư tưởng đoàn kết quốc tế của giai cấp công nhân"
         ],
-        answer: 3 // Đáp án D
+        answer: 3, // Đáp án D
+        category: "Tư tưởng Hồ Chí Minh"
     }
 ];

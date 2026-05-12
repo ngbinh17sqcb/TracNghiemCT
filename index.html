@@ -5,30 +5,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ôn tập Trắc nghiệm Chính trị</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Thêm FontAwesome cho icon -->
+    <!-- FontAwesome cho icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-star" style="color: var(--accent-color);"></i> Hệ thống Ôn tập Trắc nghiệm</h1>
-            <button id="theme-toggle" class="icon-btn" title="Giao diện Tối/Sáng"><i class="fas fa-moon"></i></button>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button id="drawer-toggle" class="icon-btn mobile-only" title="Mở danh sách câu hỏi"><i class="fas fa-bars"></i></button>
+                <h1><i class="fas fa-star" style="color: var(--accent-color);"></i> Ôn tập Trắc nghiệm</h1>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button id="pause-btn" class="icon-btn hidden" title="Tạm dừng"><i class="fas fa-pause"></i></button>
+                <button id="theme-toggle" class="icon-btn" title="Giao diện Tối/Sáng"><i class="fas fa-moon"></i></button>
+            </div>
         </header>
 
         <!-- Màn hình chờ / Cài đặt -->
         <section id="start-screen">
+            <div id="high-score-board" class="hidden">
+                <i class="fas fa-trophy" style="color: gold; font-size: 1.5rem;"></i> Kỷ lục điểm cao: <span id="highest-score">0</span>
+            </div>
             <h2>Chào mừng đồng chí!</h2>
-            <p>Vui lòng chọn chế độ để bắt đầu:</p>
+            
+            <div class="custom-setup">
+                <h3><i class="fas fa-sliders-h"></i> Tùy chỉnh bài thi</h3>
+                <div class="setup-grid">
+                    <div class="setup-group">
+                        <label>Số lượng câu:</label>
+                        <select id="setup-count">
+                            <option value="all">Toàn bộ</option>
+                            <option value="5">5 câu</option>
+                            <option value="10">10 câu</option>
+                            <option value="20">20 câu</option>
+                            <option value="50">50 câu</option>
+                        </select>
+                    </div>
+                    <div class="setup-group">
+                        <label>Thời gian (chỉ áp dụng Thi thử):</label>
+                        <select id="setup-time">
+                            <option value="5">5 phút</option>
+                            <option value="10">10 phút</option>
+                            <option value="15" selected>15 phút</option>
+                            <option value="30">30 phút</option>
+                            <option value="60">60 phút</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="resume-container" class="hidden" style="margin-top: 20px;">
+                <button onclick="resumeQuiz()" class="btn btn-info" style="width: 100%; justify-content: center; font-size: 1.1rem; padding: 15px;">
+                    <i class="fas fa-play"></i> Tiếp tục bài đang làm dở
+                </button>
+                <button onclick="clearSavedProgress()" class="btn btn-outline" style="width: 100%; justify-content: center; margin-top: 10px;">
+                    <i class="fas fa-trash-alt"></i> Xóa dữ liệu cũ
+                </button>
+            </div>
+
+            <p style="margin-top: 30px; font-weight: bold;">Hoặc bắt đầu bài thi mới:</p>
             <div class="mode-selection">
                 <div class="mode-card" onclick="startQuiz('practice')">
                     <i class="fas fa-book-reader"></i>
                     <h3>Chế độ Ôn luyện</h3>
-                    <p>Biết kết quả ngay sau mỗi câu, không giới hạn thời gian.</p>
+                    <p>Biết kết quả ngay sau mỗi câu, có âm thanh báo, không giới hạn thời gian.</p>
                 </div>
                 <div class="mode-card" onclick="startQuiz('exam')">
                     <i class="fas fa-stopwatch"></i>
                     <h3>Chế độ Thi thử</h3>
-                    <p>Tính giờ (15 phút), nộp bài mới biết điểm và được xem lại.</p>
+                    <p>Tính giờ, nộp bài mới biết điểm. Có thể xem lại đáp án sau khi nộp.</p>
                 </div>
             </div>
         </section>
@@ -46,11 +93,12 @@
             </div>
 
             <div class="quiz-body">
-                <div class="question-section">
+                <div class="question-section" id="question-section">
                     <div class="question-header">
-                        <h3 id="question-text">Đang tải câu hỏi...</h3>
+                        <span id="category-badge" class="badge">Chủ đề</span>
                         <button id="flag-btn" class="icon-btn" title="Đánh dấu câu hỏi này"><i class="far fa-flag"></i></button>
                     </div>
+                    <h3 id="question-text">Đang tải câu hỏi...</h3>
                     <div id="answer-options" class="options-grid">
                         <!-- Đáp án -->
                     </div>
@@ -62,8 +110,15 @@
                     </div>
                 </div>
 
-                <div class="navigator-section">
-                    <h4>Bảng câu hỏi</h4>
+                <!-- Backdrop cho mobile drawer -->
+                <div id="drawer-backdrop" class="drawer-backdrop"></div>
+                
+                <div class="navigator-section" id="navigator-drawer">
+                    <div class="drawer-header mobile-only">
+                        <h4>Bảng câu hỏi</h4>
+                        <button id="close-drawer" class="icon-btn"><i class="fas fa-times"></i></button>
+                    </div>
+                    <h4 class="desktop-only">Bảng câu hỏi</h4>
                     <div id="question-navigator" class="nav-grid">
                         <!-- Các ô số -->
                     </div>
@@ -74,7 +129,7 @@
         <!-- Màn hình kết quả -->
         <section id="result-screen" class="hidden">
             <h2><i class="fas fa-award"></i> Kết quả bài làm</h2>
-            <div class="score-circle">
+            <div class="score-circle" id="score-circle">
                 <span id="score-number">0</span>
                 <span class="score-divider">/</span>
                 <span id="total-number">0</span>
@@ -96,6 +151,17 @@
                 <button onclick="location.reload()" class="btn btn-primary"><i class="fas fa-home"></i> Về trang chủ</button>
             </div>
         </section>
+        
+        <!-- Màn hình Pause (Tạm dừng) -->
+        <div id="pause-overlay" class="hidden">
+            <div class="pause-content">
+                <i class="fas fa-pause-circle" style="font-size: 4rem; color: var(--primary-color); margin-bottom: 20px;"></i>
+                <h2>Bài thi đang tạm dừng</h2>
+                <p>Nội dung câu hỏi đã bị ẩn để đảm bảo tính công bằng.</p>
+                <button onclick="togglePause()" class="btn btn-primary" style="margin-top: 20px; font-size: 1.2rem;"><i class="fas fa-play"></i> Tiếp tục làm bài</button>
+            </div>
+        </div>
+
     </div>
 
     <!-- Modal xác nhận nộp bài -->
