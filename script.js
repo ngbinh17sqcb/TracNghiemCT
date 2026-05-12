@@ -205,10 +205,10 @@ function buildNavigator() {
         btn.classList.add('nav-btn');
         btn.innerText = index + 1;
         btn.onclick = () => {
+            if (currentQuestionIndex === index) return;
             const direction = index > currentQuestionIndex ? 'slide-left' : 'slide-right';
             currentQuestionIndex = index;
             loadQuestion(direction);
-            if(window.innerWidth <= 768) toggleDrawer();
         };
         questionNavigator.appendChild(btn);
     });
