@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ôn tập Trắc nghiệm Chính trị</title>
+    <title>Ôn tập Trắc nghiệm Công tác Đảng, công tác chính trị</title>
     <link rel="stylesheet" href="style.css">
     <!-- FontAwesome cho icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,15 +11,38 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <button id="drawer-toggle" class="icon-btn hidden" title="Mở danh sách câu hỏi"><i class="fas fa-bars"></i></button>
-                <h1><i class="fas fa-star" style="color: var(--accent-color);"></i> Ôn tập Trắc nghiệm</h1>
+    <div id="login-overlay" class="modal">
+        <div class="modal-content">
+            <h3>Đăng nhập</h3>
+            <p>Nhập mật khẩu để sử dụng chương trình.</p>
+            <div class="password-wrapper">
+                <input type="password" id="password-input" placeholder="Mật khẩu">
+                <button id="toggle-password" class="icon-btn" title="Hiện/Ẩn mật khẩu"><i class="fas fa-eye"></i></button>
             </div>
-            <div style="display: flex; gap: 10px;">
+            <p id="login-error" class="hidden" style="color: var(--wrong-color); margin-top: 10px; text-align: center;">Mật khẩu không chính xác!</p>
+            <div class="modal-actions">
+                <button id="login-btn" class="btn">Vào</button>
+            </div>
+        </div>
+    </div>
+    <div class="container hidden">
+        <header class="app-header">
+            <div class="header-left">
+                <button id="drawer-toggle" class="icon-btn hidden" title="Mở danh sách câu hỏi"><i class="fas fa-bars"></i></button>
+            </div>
+            <div class="header-center">
+                <h2 class="header-subtitle">CẦU ĐƯỜNG KHOÁ 29</h2>
+                <h1 class="header-title"><i class="fas fa-star" style="color: var(--accent-color);"></i> ÔN TẬP TRẮC NGHIỆM CÔNG TÁC ĐẢNG, CÔNG TÁC CHÍNH TRỊ <i class="fas fa-star" style="color: var(--accent-color);"></i></h1>
+            </div>
+            <div class="header-right">
                 <button id="pause-btn" class="icon-btn hidden" title="Tạm dừng"><i class="fas fa-pause"></i></button>
-                <button id="theme-toggle" class="icon-btn" title="Giao diện Tối/Sáng"><i class="fas fa-moon"></i></button>
+                <div class="theme-switcher-container">
+                    <span class="theme-label-text">Sáng/Tối</span>
+                    <label class="theme-switch" title="Giao diện Tối/Sáng">
+                        <input type="checkbox" id="theme-checkbox">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
             </div>
         </header>
 
@@ -28,7 +51,8 @@
             <div id="high-score-board" class="hidden">
                 <i class="fas fa-trophy" style="color: gold; font-size: 1.5rem;"></i> Kỷ lục điểm cao: <span id="highest-score">0</span>
             </div>
-            <h2>Chào mừng đồng chí!</h2>
+            
+            <h1 class="motivational-quote">Chúc các đồng chí thi tốt!</h1>
             
             <div class="custom-setup">
                 <h3><i class="fas fa-sliders-h"></i> Tùy chỉnh bài thi</h3>
@@ -65,7 +89,7 @@
                 </button>
             </div>
 
-            <p style="margin-top: 30px; font-weight: bold;">Hoặc bắt đầu bài thi mới:</p>
+            <p style="margin-top: 30px; font-weight: bold;">Chọn chế độ làm bài:</p>
             <div class="mode-selection">
                 <div class="mode-card" onclick="startQuiz('practice')">
                     <i class="fas fa-book-reader"></i>
@@ -178,5 +202,8 @@
 
     <script src="questions.js"></script>
     <script src="script.js"></script>
+    <footer class="app-footer">
+        Chương trình ôn tập trắc nghiệm có thể mắc sai sót. Mọi góp ý liên quan đến đáp án gửi về Trung đội trưởng kiêm chức Nguyễn Thanh Bình
+    </footer>
 </body>
 </html>

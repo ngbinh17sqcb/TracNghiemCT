@@ -1,4 +1,31 @@
-// === AUDIO EFFECTS (Web Audio API - không cần file ngoài) ===
+// === HỆ THỐNG BẢO VỆ NỘI BỘ - CHẶN SOI CODE ===
+// 1. Chặn menu chuột phải
+document.addEventListener('contextmenu', event => event.preventDefault());
+
+// 2. Chặn các phím nóng của dân kỹ thuật
+document.addEventListener('keydown', function(e) {
+    if (e.keyCode === 123 || // F12
+        (e.ctrlKey && e.shiftKey && e.keyCode === 73) || // Ctrl+Shift+I
+        (e.ctrlKey && e.shiftKey && e.keyCode === 74) || // Ctrl+Shift+J
+        (e.ctrlKey && e.keyCode === 85) || // Ctrl+U
+        (e.ctrlKey && e.keyCode === 83)    // Ctrl+S
+    ) {
+        e.preventDefault();
+    }
+});
+
+// 3. Cấm chụp màn hình (làm mờ giao diện khi không focus)
+window.addEventListener('blur', () => {
+    // Chỉ áp dụng khi đã đăng nhập
+    if (!mainContainer.classList.contains('hidden')) {
+        document.body.classList.add('no-peeking');
+    }
+});
+window.addEventListener('focus', () => {
+    document.body.classList.remove('no-peeking');
+});
+
+// === AUDIO EFFECTS ===
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 function playSound(type) {
@@ -42,7 +69,6 @@ const startScreen = document.getElementById('start-screen');
 const quizApp = document.getElementById('quiz-app');
 const resultScreen = document.getElementById('result-screen');
 const reviewScreen = document.getElementById('review-screen');
-const themeToggle = document.getElementById('theme-toggle');
 
 const questionSection = document.getElementById('question-section');
 const questionText = document.getElementById('question-text');
@@ -65,8 +91,50 @@ const confirmModal = document.getElementById('confirm-modal');
 const unansweredWarning = document.getElementById('unanswered-warning');
 const unansweredCount = document.getElementById('unanswered-count');
 
+const loginOverlay = document.getElementById('login-overlay');
+const loginBtn = document.getElementById('login-btn');
+const passwordInput = document.getElementById('password-input');
+const loginError = document.getElementById('login-error');
+const mainContainer = document.querySelector('.container');
+const togglePasswordBtn = document.getElementById('toggle-password');
+
+function handleLogin() {
+    if (passwordInput.value === 'cauduongk29') {
+        sessionStorage.setItem('tracnghiem_logged_in', 'true');
+        loginOverlay.classList.add('hidden');
+        mainContainer.classList.remove('hidden');
+    } else {
+        loginError.classList.remove('hidden');
+        passwordInput.focus();
+    }
+}
+
+loginBtn.addEventListener('click', handleLogin);
+passwordInput.addEventListener('keyup', (event) => {
+    if (event.key === 'Enter') {
+        handleLogin();
+    }
+});
+
+togglePasswordBtn.addEventListener('click', function() {
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+    
+    const icon = this.querySelector('i');
+    icon.classList.toggle('fa-eye');
+    icon.classList.toggle('fa-eye-slash');
+    passwordInput.focus();
+});
+
 // Init app on load
 function initApp() {
+    if (sessionStorage.getItem('tracnghiem_logged_in') === 'true') {
+        loginOverlay.classList.add('hidden');
+        mainContainer.classList.remove('hidden');
+    } else {
+        passwordInput.focus(); // Focus on password input on load
+    }
+
     // Load High Score
     const highScore = localStorage.getItem('tracnghiem_highscore');
     if (highScore) {
@@ -82,10 +150,13 @@ function initApp() {
 initApp();
 
 // Dark Mode
-themeToggle.addEventListener('click', () => {
-    const isDark = document.body.getAttribute('data-theme') === 'dark';
-    document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-    themeToggle.innerHTML = isDark ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+const themeCheckbox = document.getElementById('theme-checkbox');
+themeCheckbox.addEventListener('change', () => {
+    if (themeCheckbox.checked) {
+        document.body.setAttribute('data-theme', 'dark');
+    } else {
+        document.body.setAttribute('data-theme', 'light');
+    }
 });
 
 // Mobile Drawer
