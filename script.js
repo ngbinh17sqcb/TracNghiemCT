@@ -204,9 +204,16 @@ function startQuiz(mode) {
     activeQuestions = JSON.parse(JSON.stringify(filteredData)); // Deep copy
 
     activeQuestions.forEach(q => {
-        let optionsWithState = q.options.map((opt, index) => ({
-            text: opt, originalIndex: index, isCorrect: index === q.answer
-        }));
+        let optionsWithState = q.options.map((opt, index) => {
+            let optionText = opt;
+            // Thêm dấu "." vào cuối đáp án đúng nếu chưa có
+            if (index === q.answer && !optionText.trim().endsWith('.')) {
+                optionText = optionText.trim() + '.';
+            }
+            return {
+                text: optionText, originalIndex: index, isCorrect: index === q.answer
+            };
+        });
         shuffleArray(optionsWithState);
         q.shuffledOptions = optionsWithState;
     });
