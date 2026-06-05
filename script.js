@@ -14,15 +14,32 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// 3. Cấm chụp màn hình (làm mờ giao diện khi không focus)
-window.addEventListener('blur', () => {
-    // Chỉ áp dụng khi đã đăng nhập
-    if (!mainContainer.classList.contains('hidden')) {
-        document.body.classList.add('no-peeking');
+// 3. Cấm chụp màn hình (làm mờ giao diện khi không focus) và Cảnh báo gian lận
+function recordCheat() {
+    // Chỉ ghi nhận gian lận khi đang làm bài (không bị tạm dừng) ở bất kỳ chế độ nào
+    if (!quizApp.classList.contains('hidden') && !isPaused) {
+        const now = Date.now();
+        if (now - lastCheatTime > 1000) { // Debounce 1 giây để tránh đếm trùng sự kiện
+            cheatCount++;
+            if (cheatCountText) cheatCountText.innerText = cheatCount;
+            saveProgress();
+            lastCheatTime = now;
+            setTimeout(() => {
+                alert(`CẢNH BÁO GIAN LẬN!\nBạn đã chuyển tab hoặc rời khỏi màn hình bài thi ${cheatCount} lần.\nHành vi này đã được ghi nhận!`);
+            }, 50);
+        }
     }
+}
+
+window.addEventListener('blur', () => {
+    document.body.classList.add('no-peeking');
+    recordCheat();
 });
 window.addEventListener('focus', () => {
     document.body.classList.remove('no-peeking');
+});
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) recordCheat();
 });
 
 // === AUDIO EFFECTS ===
@@ -63,6 +80,8 @@ let flags = new Set();
 let timerInterval;
 let timeLeft = 0; 
 let isPaused = false;
+let cheatCount = 0;
+let lastCheatTime = 0;
 
 // DOM Elements
 const startScreen = document.getElementById('start-screen');
@@ -91,49 +110,18 @@ const confirmModal = document.getElementById('confirm-modal');
 const unansweredWarning = document.getElementById('unanswered-warning');
 const unansweredCount = document.getElementById('unanswered-count');
 
-const loginOverlay = document.getElementById('login-overlay');
-const loginBtn = document.getElementById('login-btn');
-const passwordInput = document.getElementById('password-input');
-const loginError = document.getElementById('login-error');
-const mainContainer = document.querySelector('.container');
-const togglePasswordBtn = document.getElementById('toggle-password');
-
-function handleLogin() {
-    if (passwordInput.value === 'cauduongk29') {
-        sessionStorage.setItem('tracnghiem_logged_in', 'true');
-        loginOverlay.classList.add('hidden');
-        mainContainer.classList.remove('hidden');
-    } else {
-        loginError.classList.remove('hidden');
-        passwordInput.focus();
-    }
-}
-
-loginBtn.addEventListener('click', handleLogin);
-passwordInput.addEventListener('keyup', (event) => {
-    if (event.key === 'Enter') {
-        handleLogin();
-    }
-});
-
-togglePasswordBtn.addEventListener('click', function() {
-    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-    passwordInput.setAttribute('type', type);
-    
-    const icon = this.querySelector('i');
-    icon.classList.toggle('fa-eye');
-    icon.classList.toggle('fa-eye-slash');
-    passwordInput.focus();
-});
+const cheatCountDisplay = document.getElementById('cheat-count');
+const cheatCountText = cheatCountDisplay.querySelector('span');
+const resultCheatWarning = document.getElementById('result-cheat-warning');
+const finalCheatCount = document.getElementById('final-cheat-count');
 
 // Init app on load
 function initApp() {
-    if (sessionStorage.getItem('tracnghiem_logged_in') === 'true') {
-        loginOverlay.classList.add('hidden');
-        mainContainer.classList.remove('hidden');
-    } else {
-        passwordInput.focus(); // Focus on password input on load
-    }
+    // Bỏ qua màn hình login (đề phòng trường hợp HTML chưa được xóa)
+    const loginOverlay = document.getElementById('login-overlay');
+    const mainContainer = document.querySelector('.container');
+    if (loginOverlay) loginOverlay.classList.add('hidden');
+    if (mainContainer) mainContainer.classList.remove('hidden');
 
     // Load High Score
     const highScore = localStorage.getItem('tracnghiem_highscore');
@@ -204,9 +192,16 @@ function startQuiz(mode) {
     activeQuestions = JSON.parse(JSON.stringify(filteredData)); // Deep copy
 
     activeQuestions.forEach(q => {
-        let optionsWithState = q.options.map((opt, index) => ({
-            text: opt, originalIndex: index, isCorrect: index === q.answer
-        }));
+        let optionsWithState = q.options.map((opt, index) => {
+            let optionText = opt;
+            // Thêm dấu "." vào cuối đáp án đúng nếu chưa có
+            if (index === q.answer && !optionText.trim().endsWith('.')) {
+                optionText = optionText.trim() + '.';
+            }
+            return {
+                text: optionText, originalIndex: index, isCorrect: index === q.answer
+            };
+        });
         shuffleArray(optionsWithState);
         q.shuffledOptions = optionsWithState;
     });
@@ -215,6 +210,7 @@ function startQuiz(mode) {
     flags.clear();
     currentQuestionIndex = 0;
     timeLeft = parseInt(selectedTime) * 60;
+    cheatCount = 0;
     
     setupUI();
     saveProgress(); // Lưu state ban đầu
@@ -229,6 +225,7 @@ function resumeQuiz() {
         userAnswers = saved.userAnswers;
         flags = new Set(saved.flags);
         timeLeft = saved.timeLeft;
+        cheatCount = saved.cheatCount || 0;
         setupUI();
     }
 }
@@ -243,7 +240,7 @@ function clearSavedProgress() {
 function saveProgress() {
     const state = {
         currentMode, activeQuestions, currentQuestionIndex,
-        userAnswers, flags: Array.from(flags), timeLeft
+        userAnswers, flags: Array.from(flags), timeLeft, cheatCount
     };
     localStorage.setItem('tracnghiem_save', JSON.stringify(state));
 }
@@ -252,6 +249,10 @@ function setupUI() {
     startScreen.classList.add('hidden');
     quizApp.classList.remove('hidden');
     buildNavigator();
+
+    // Hiển thị bộ đếm vi phạm ở cả hai chế độ
+    cheatCountDisplay.classList.remove('hidden');
+    cheatCountText.innerText = cheatCount;
 
     if (currentMode === 'exam') {
         timerDisplay.classList.remove('hidden');
@@ -509,6 +510,13 @@ function finishQuiz() {
     const scoreCircle = document.getElementById('score-circle');
     let tyLe = score / activeQuestions.length;
     let percent = Math.round(tyLe * 100);
+
+    if (cheatCount > 0) {
+        resultCheatWarning.classList.remove('hidden');
+        finalCheatCount.innerText = cheatCount;
+    } else {
+        resultCheatWarning.classList.add('hidden');
+    }
 
     // Update Highscore
     let highest = localStorage.getItem('tracnghiem_highscore') || 0;
